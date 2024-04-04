@@ -4,7 +4,7 @@ using System.IO.Compression;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace Edelstein.Assets.Management;
+namespace Edelstein.Assets.Management.Manifest;
 
 #pragma warning disable SYSLIB0011
 public static class ManifestSerializer

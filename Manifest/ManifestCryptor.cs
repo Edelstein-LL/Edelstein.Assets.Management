@@ -3,7 +3,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Edelstein.Assets.Management;
+namespace Edelstein.Assets.Management.Manifest;
 
 public static class ManifestCryptor
 {
