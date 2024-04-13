@@ -34,4 +34,26 @@ public static class ManifestCryptor
 
         return decryptedDataStream;
     }
+
+    public static byte[] Encrypt(byte[] data)
+    {
+        using MemoryStream encryptedData = Decrypt(data.AsMemory().AsStream());
+        return encryptedData.ToArray();
+    }
+
+    public static MemoryStream Encrypt(Stream data)
+    {
+        using Aes aes = Aes.Create();
+
+        using ICryptoTransform encryptor = aes.CreateEncryptor(AesKeyBytes, AesIvBytes);
+
+        MemoryStream encryptedDataStream = new();
+        using CryptoStream cryptoStream = new(encryptedDataStream, encryptor, CryptoStreamMode.Write, true);
+        data.CopyTo(cryptoStream);
+        cryptoStream.FlushFinalBlock();
+
+        encryptedDataStream.Seek(0, SeekOrigin.Begin);
+
+        return encryptedDataStream;
+    }
 }
