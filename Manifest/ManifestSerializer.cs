@@ -1,5 +1,3 @@
-using CommunityToolkit.HighPerformance;
-
 using System.IO.Compression;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -10,8 +8,11 @@ namespace Edelstein.Assets.Management.Manifest;
 public static class ManifestSerializer
 {
     public static T DeserializeCompressedBinary<T, TBinder>(byte[] serializedData, TBinder? serializationBinder = null)
-        where TBinder : SerializationBinder, new() =>
-        DeserializeCompressedBinary<T, TBinder>(serializedData.AsMemory().AsStream(), serializationBinder);
+        where TBinder : SerializationBinder, new()
+    {
+        using MemoryStream dataStream = new(serializedData);
+        return DeserializeCompressedBinary<T, TBinder>(dataStream, serializationBinder);
+    }
 
     public static T DeserializeCompressedBinary<T, TBinder>(Stream serializedData, TBinder? serializationBinder = null)
         where TBinder : SerializationBinder, new()

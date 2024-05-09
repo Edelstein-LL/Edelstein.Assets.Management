@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.HighPerformance;
-
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 
 namespace Edelstein.Assets.Management.Manifest;
@@ -15,7 +13,8 @@ public static class ManifestCryptor
 
     public static byte[] Decrypt(byte[] encryptedData)
     {
-        using MemoryStream decryptedData = Decrypt(encryptedData.AsMemory().AsStream());
+        using MemoryStream encryptedStream = new(encryptedData);
+        using MemoryStream decryptedData = Decrypt(encryptedStream);
         return decryptedData.ToArray();
     }
 
@@ -37,7 +36,8 @@ public static class ManifestCryptor
 
     public static byte[] Encrypt(byte[] data)
     {
-        using MemoryStream encryptedData = Decrypt(data.AsMemory().AsStream());
+        using MemoryStream dataStream = new(data);
+        using MemoryStream encryptedData = Decrypt(dataStream);
         return encryptedData.ToArray();
     }
 
