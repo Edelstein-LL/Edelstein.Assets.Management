@@ -24,4 +24,23 @@ public static class ManifestSerializer
 
         return (T)binaryFormatter.Deserialize(gZipStream);
     }
+
+    public static MemoryStream SerializeAndEncrypt<T, TBinder>(T data, TBinder? serializationBinder = null)
+        where TBinder : SerializationBinder, new()
+    {
+        serializationBinder ??= new TBinder();
+
+        BinaryFormatter binaryFormatter = new() { Binder = serializationBinder };
+
+        using MemoryStream compressedStream = new();
+        using GZipStream gZipStream = new(compressedStream, CompressionMode.Compress, true);
+
+        binaryFormatter.Serialize(gZipStream, data!);
+
+        compressedStream.Position = 0;
+
+        MemoryStream encryptedStream = ManifestCryptor.Encrypt(compressedStream);
+
+        return encryptedStream;
+    }
 }

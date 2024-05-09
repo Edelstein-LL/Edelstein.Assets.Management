@@ -5,27 +5,27 @@ namespace Edelstein.Assets.Management.Manifest.Movie;
 [Serializable]
 public class MovieManifestEntry : IManifestEntry, ISerializable
 {
-    public required string Identifier { get; init; }
+    public required string Identifier { get; set; }
 
-    public required string Name { get; init; }
+    public required string Name { get; set; }
 
-    public required string Hash { get; init; }
+    public required string Hash { get; set; }
 
-    public required string UsmHash { get; init; }
+    public required string UsmHash { get; set; }
 
-    public long UsmSize { get; init; }
+    public long UsmSize { get; set; }
 
-    public required string UsmPrimaryPartHash { get; init; }
+    public required string UsmPrimaryPartHash { get; set; }
 
-    public long UsmPrimaryPartSize { get; init; }
+    public long UsmPrimaryPartSize { get; set; }
 
-    public required string UsmSecondaryPartHash { get; init; }
+    public required string UsmSecondaryPartHash { get; set; }
 
-    public long UsmSecondaryPartSize { get; init; }
+    public long UsmSecondaryPartSize { get; set; }
 
-    public bool EnableSplit { get; init; }
+    public bool EnableSplit { get; set; }
 
-    public required string[] Labels { get; init; }
+    public required string[] Labels { get; set; }
 
     public MovieManifestEntry() { }
 
@@ -44,5 +44,18 @@ public class MovieManifestEntry : IManifestEntry, ISerializable
         Labels = (string[])info.GetValue("m_labels", typeof(string[]))!;
     }
 
-    public void GetObjectData(SerializationInfo info, StreamingContext context) { }
+    public void GetObjectData(SerializationInfo info, StreamingContext context)
+    {
+        info.AddValue("m_identifier", Identifier);
+        info.AddValue("m_name", Name);
+        info.AddValue("m_hash", Hash);
+        info.AddValue("m_usmHash", UsmHash);
+        info.AddValue("m_usmSize", UsmSize);
+        info.AddValue("m_usmPrimaryPartHash", UsmPrimaryPartHash);
+        info.AddValue("m_usmPrimaryPartSize", UsmPrimaryPartSize);
+        info.AddValue("m_usmSecondaryPartHash", UsmSecondaryPartHash);
+        info.AddValue("m_usmSecondaryPartSize", UsmSecondaryPartSize);
+        info.AddValue("m_enableSplit", EnableSplit);
+        info.AddValue("m_labels", Labels);
+    }
 }

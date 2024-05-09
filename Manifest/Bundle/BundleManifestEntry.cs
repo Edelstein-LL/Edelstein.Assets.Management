@@ -5,21 +5,21 @@ namespace Edelstein.Assets.Management.Manifest.Bundle;
 [Serializable]
 public class BundleManifestEntry : IManifestEntry, ISerializable
 {
-    public required string Identifier { get; init; }
+    public required string Identifier { get; set; }
 
-    public required string Name { get; init; }
+    public required string Name { get; set; }
 
-    public required string Hash { get; init; }
+    public required string Hash { get; set; }
 
-    public uint Crc { get; init; }
+    public uint Crc { get; set; }
 
-    public long Length { get; init; }
+    public long Length { get; set; }
 
-    public required string[] Dependencies { get; init; }
+    public string[] Dependencies { get; set; } = [];
 
-    public required string[] Labels { get; init; }
+    public string[] Labels { get; set; } = [];
 
-    public required string[] Assets { get; init; }
+    public string[] Assets { get; set; } = [];
 
     public BundleManifestEntry() { }
 
@@ -35,5 +35,15 @@ public class BundleManifestEntry : IManifestEntry, ISerializable
         Assets = (string[])info.GetValue("m_assets", typeof(string[]))!;
     }
 
-    public void GetObjectData(SerializationInfo info, StreamingContext context) { }
+    public void GetObjectData(SerializationInfo info, StreamingContext context)
+    {
+        info.AddValue("m_identifier", Identifier);
+        info.AddValue("m_name", Name);
+        info.AddValue("m_hash", Hash);
+        info.AddValue("m_crc", Crc);
+        info.AddValue("m_length", Length);
+        info.AddValue("m_dependencies", Dependencies);
+        info.AddValue("m_labels", Labels);
+        info.AddValue("m_assets", Assets);
+    }
 }

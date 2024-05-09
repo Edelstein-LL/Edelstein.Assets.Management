@@ -5,39 +5,39 @@ namespace Edelstein.Assets.Management.Manifest.Sound;
 [Serializable]
 public class SoundManifestEntry : IManifestEntry, ISerializable
 {
-    public required string Identifier { get; init; }
+    public required string Identifier { get; set; }
 
-    public required string Name { get; init; }
+    public required string Name { get; set; }
 
-    public required string Hash { get; init; }
+    public required string Hash { get; set; }
 
-    public required string AcbHash { get; init; }
+    public required string AcbHash { get; set; }
 
-    public long AcbSize { get; init; }
+    public long AcbSize { get; set; }
 
-    public required string AcbPrimaryPartHash { get; init; }
+    public required string AcbPrimaryPartHash { get; set; }
 
-    public long AcbPrimaryPartSize { get; init; }
+    public long AcbPrimaryPartSize { get; set; }
 
-    public required string AcbSecondaryPartHash { get; init; }
+    public required string AcbSecondaryPartHash { get; set; }
 
-    public long AcbSecondaryPartSize { get; init; }
+    public long AcbSecondaryPartSize { get; set; }
 
-    public required string AwbHash { get; init; }
+    public required string AwbHash { get; set; }
 
-    public long AwbSize { get; init; }
+    public long AwbSize { get; set; }
 
-    public required string AwbPrimaryPartHash { get; init; }
+    public required string AwbPrimaryPartHash { get; set; }
 
-    public long AwbPrimaryPartSize { get; init; }
+    public long AwbPrimaryPartSize { get; set; }
 
-    public required string AwbSecondaryPartHash { get; init; }
+    public required string AwbSecondaryPartHash { get; set; }
 
-    public long AwbSecondaryPartSize { get; init; }
+    public long AwbSecondaryPartSize { get; set; }
 
-    public required string[] Labels { get; init; }
+    public required string[] Labels { get; set; }
 
-    public bool EnableSplit { get; init; }
+    public bool EnableSplit { get; set; }
 
     public SoundManifestEntry() { }
 
@@ -62,5 +62,24 @@ public class SoundManifestEntry : IManifestEntry, ISerializable
         EnableSplit = info.GetBoolean("m_enableSplit");
     }
 
-    public void GetObjectData(SerializationInfo info, StreamingContext context) { }
+    public void GetObjectData(SerializationInfo info, StreamingContext context)
+    {
+        info.AddValue("m_identifier", Identifier);
+        info.AddValue("m_name", Name);
+        info.AddValue("m_hash", Hash);
+        info.AddValue("m_acbHash", AcbHash);
+        info.AddValue("m_acbSize", AcbSize);
+        info.AddValue("m_acbPrimaryPartHash", AcbPrimaryPartHash);
+        info.AddValue("m_acbPrimaryPartSize", AcbPrimaryPartSize);
+        info.AddValue("m_acbSecondaryPartHash", AcbSecondaryPartHash);
+        info.AddValue("m_acbSecondaryPartSize", AcbSecondaryPartSize);
+        info.AddValue("m_awbHash", AwbHash);
+        info.AddValue("m_awbSize", AwbSize);
+        info.AddValue("m_awbPrimaryPartHash", AwbPrimaryPartHash);
+        info.AddValue("m_awbPrimaryPartSize", AwbPrimaryPartSize);
+        info.AddValue("m_awbSecondaryPartHash", AwbSecondaryPartHash);
+        info.AddValue("m_awbSecondaryPartSize", AwbSecondaryPartSize);
+        info.AddValue("m_labels", Labels);
+        info.AddValue("m_enableSplit", EnableSplit);
+    }
 }
