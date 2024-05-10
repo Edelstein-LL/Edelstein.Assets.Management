@@ -5,6 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>Edelstein.Assets.Management</RootNamespace>
+        <NoWarn>SYSLIB0011</NoWarn>
     </PropertyGroup>
 
 </Project>
