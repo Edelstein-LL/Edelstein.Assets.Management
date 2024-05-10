@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.IO.Compression;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Edelstein.Assets.Management.Manifest;
@@ -11,49 +12,29 @@ public static class ManifestCryptor
     private const string AesIv = "lmxcye89bsdfb0a1";
     private static readonly byte[] AesIvBytes = Encoding.UTF8.GetBytes(AesIv);
 
-    public static byte[] Decrypt(byte[] encryptedData)
-    {
-        using MemoryStream encryptedStream = new(encryptedData);
-        using MemoryStream decryptedData = Decrypt(encryptedStream);
-        return decryptedData.ToArray();
-    }
-
-    public static MemoryStream Decrypt(Stream encryptedData)
+    public static async Task DecryptAsync(Stream encryptedStream, Stream outputStream)
     {
         using Aes aes = Aes.Create();
 
         using ICryptoTransform decryptor = aes.CreateDecryptor(AesKeyBytes, AesIvBytes);
 
-        using CryptoStream cryptoStream = new(encryptedData, decryptor, CryptoStreamMode.Read);
-        MemoryStream decryptedDataStream = new();
-
-        cryptoStream.CopyTo(decryptedDataStream);
-
-        decryptedDataStream.Seek(0, SeekOrigin.Begin);
-
-        return decryptedDataStream;
+        await using CryptoStream cryptoStream = new(encryptedStream, decryptor, CryptoStreamMode.Read, true);
+        await using GZipStream gZipStream = new(cryptoStream, CompressionMode.Decompress, true);
+        await gZipStream.CopyToAsync(outputStream);
     }
 
-    public static byte[] Encrypt(byte[] data)
-    {
-        using MemoryStream dataStream = new(data);
-        using MemoryStream encryptedData = Decrypt(dataStream);
-        return encryptedData.ToArray();
-    }
-
-    public static MemoryStream Encrypt(Stream data)
+    public static async Task EncryptAsync(Stream dataStream, Stream outputStream)
     {
         using Aes aes = Aes.Create();
 
         using ICryptoTransform encryptor = aes.CreateEncryptor(AesKeyBytes, AesIvBytes);
 
-        MemoryStream encryptedDataStream = new();
-        using CryptoStream cryptoStream = new(encryptedDataStream, encryptor, CryptoStreamMode.Write, true);
-        data.CopyTo(cryptoStream);
-        cryptoStream.FlushFinalBlock();
+        await using CryptoStream cryptoStream = new(outputStream, encryptor, CryptoStreamMode.Write, true);
+        await using (GZipStream gZipStream = new(cryptoStream, CompressionMode.Compress, true))
+        {
+            await dataStream.CopyToAsync(gZipStream);
+        }
 
-        encryptedDataStream.Seek(0, SeekOrigin.Begin);
-
-        return encryptedDataStream;
+        await cryptoStream.FlushFinalBlockAsync();
     }
 }

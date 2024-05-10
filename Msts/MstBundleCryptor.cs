@@ -6,10 +6,10 @@ namespace Edelstein.Assets.Management.Msts;
 
 public class MstBundleCryptor
 {
-    public static MemoryStream DecryptMstBundle(Stream data)
+    public static void DecryptMstBundle(Stream dataStream, Stream outputStream)
     {
         using MemoryStream ms = new();
-        data.CopyTo(ms);
+        dataStream.CopyTo(ms);
 
         byte[] buffer = ms.GetBuffer();
         ReadOnlySpan<byte> dataSpan = buffer.AsSpan(0, (int)ms.Length);
@@ -28,28 +28,15 @@ public class MstBundleCryptor
 
         ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 
-        using MemoryStream encryptedDataStream = new(buffer, 36 + ivLength, dataSpan.Length - 36 - ivLength);
-        using CryptoStream cryptoStream = new(encryptedDataStream, decryptor, CryptoStreamMode.Read);
-        using GZipStream gZipStream = new(cryptoStream, CompressionMode.Decompress);
-        MemoryStream resultMemoryStream = new();
+        using MemoryStream encryptedStream = new(buffer, 36 + ivLength, dataSpan.Length - 36 - ivLength);
+        using CryptoStream cryptoStream = new(encryptedStream, decryptor, CryptoStreamMode.Read, true);
+        using GZipStream gZipStream = new(cryptoStream, CompressionMode.Decompress, true);
 
-        gZipStream.CopyTo(resultMemoryStream);
-
-        resultMemoryStream.Position = 0;
-
-        return resultMemoryStream;
+        gZipStream.CopyTo(outputStream);
     }
 
-    public static MemoryStream EncryptMstBundle(Stream data)
+    public static void EncryptMstBundle(Stream dataStream, Stream outputStream)
     {
-        using MemoryStream compressedStream = new();
-        using (GZipStream gZipStream = new(compressedStream, CompressionMode.Compress, true))
-        {
-            data.CopyTo(gZipStream);
-        }
-
-        compressedStream.Position = 0;
-
         byte[] salt = new byte[16];
         RandomNumberGenerator.Fill(salt);
 
@@ -67,20 +54,19 @@ public class MstBundleCryptor
         Span<byte> beginningFiller = stackalloc byte[16];
         beginningFiller.Clear();
 
-        MemoryStream encryptedStream = new();
-        encryptedStream.Write(beginningFiller);
-        encryptedStream.Write(salt, 0, salt.Length);
-        encryptedStream.Write(ivLengthBinary, 0, ivLengthBinary.Length);
-        encryptedStream.Write(iv, 0, iv.Length);
+        outputStream.Write(beginningFiller);
+        outputStream.Write(salt, 0, salt.Length);
+        outputStream.Write(ivLengthBinary, 0, ivLengthBinary.Length);
+        outputStream.Write(iv, 0, iv.Length);
 
         using ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-        using CryptoStream cryptoStream = new(encryptedStream, encryptor, CryptoStreamMode.Write, true);
+        using CryptoStream cryptoStream = new(outputStream, encryptor, CryptoStreamMode.Write, true);
 
-        compressedStream.CopyTo(cryptoStream);
+        using (GZipStream gZipStream = new(cryptoStream, CompressionMode.Compress, true))
+        {
+            dataStream.CopyTo(gZipStream);
+        }
+
         cryptoStream.FlushFinalBlock();
-
-        encryptedStream.Position = 0;
-
-        return encryptedStream;
     }
 }
