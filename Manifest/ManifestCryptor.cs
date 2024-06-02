@@ -23,6 +23,16 @@ public static class ManifestCryptor
         await gZipStream.CopyToAsync(outputStream);
     }
 
+    public static async Task DecryptUncompressedAsync(Stream encryptedStream, Stream outputStream)
+    {
+        using Aes aes = Aes.Create();
+
+        using ICryptoTransform decryptor = aes.CreateDecryptor(AesKeyBytes, AesIvBytes);
+
+        await using CryptoStream cryptoStream = new(encryptedStream, decryptor, CryptoStreamMode.Read, true);
+        await cryptoStream.CopyToAsync(outputStream);
+    }
+
     public static async Task EncryptAsync(Stream dataStream, Stream outputStream)
     {
         using Aes aes = Aes.Create();
