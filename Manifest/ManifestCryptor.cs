@@ -35,6 +35,10 @@ public static class ManifestCryptor
             await dataStream.CopyToAsync(gZipStream);
         }
 
+        #if NET8_0_OR_GREATER
         await cryptoStream.FlushFinalBlockAsync();
+        #else
+        cryptoStream.FlushFinalBlock();
+        #endif
     }
 }
