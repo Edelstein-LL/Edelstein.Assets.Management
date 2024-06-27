@@ -51,4 +51,20 @@ public static class ManifestCryptor
         cryptoStream.FlushFinalBlock();
         #endif
     }
+
+    public static async Task EncryptUncompressedAsync(Stream dataStream, Stream outputStream)
+    {
+        using Aes aes = Aes.Create();
+
+        using ICryptoTransform encryptor = aes.CreateEncryptor(AesKeyBytes, AesIvBytes);
+
+        await using CryptoStream cryptoStream = new(outputStream, encryptor, CryptoStreamMode.Write, true);
+        await dataStream.CopyToAsync(cryptoStream);
+
+        #if NET8_0_OR_GREATER
+        await cryptoStream.FlushFinalBlockAsync();
+        #else
+        cryptoStream.FlushFinalBlock();
+        #endif
+    }
 }
